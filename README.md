@@ -12,8 +12,8 @@
 
 #### Command Table 3 :
 - **mv**
-    **mv biasa**
-    **mv \***
+    - **mv biasa**
+    - **mv \***
 - **rm**
     - **rm biasa**
     - **rm -r**
