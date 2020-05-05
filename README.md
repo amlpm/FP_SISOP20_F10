@@ -1,20 +1,20 @@
 # FP_SISOP_F10
 
-## Geizka Wahyu 05111840000062
-## Amelia Puji  05111840000147
+### Geizka Wahyu 05111840000062
+### Amelia Puji  05111840000147
 
-### Command Table 1 :
+#### Command Table 1 :
 * [ ] touch :
 
-### Command Table 2 :
-* [ ] head :
+#### Command Table 2 :
+* [x] head :
 * [ ] less :
 
-### Command Table 3 :
+#### Command Table 3 :
 * [ ] mv :
-  * [x] mv biasa
+  * [ ] mv biasa
   * [ ] mv *
-* [ ] rm :
+* [x] rm :
   * [x] rm biasa
-  * [ ] rm -r
-  * [ ] rm *
+  * [x] rm -r
+  * [x] rm *
