@@ -4,7 +4,7 @@
 #include "fcntl.h"
 #include "fs.h"
 
-char *parent_dir;
+char *dir;
 
 //sama kyk strcat
 void strcat(char *destination, char *source){
@@ -12,7 +12,7 @@ void strcat(char *destination, char *source){
     int j = strlen (destination);
     int x = strlen (source);
     for (int i = 0; i < x; i++, j++) destination[j] = source[i];
-    destination[j]='\0';
+    destination[j] = '\0';
 }
 
 //kalu hapus file / direktori dalam folder, harus rekursif / baca semua file / direktori di dalamnya
@@ -51,19 +51,19 @@ void recursiveDir (char * path, int flag) {
             ++dalemDir;
 
             char *temp = malloc(256*sizeof(char));
-            strcpy(temp, parent_dir);       //temp = parentDir
-            strcat(parent_dir, dalemDir);   //parent dir = dalemDir
-            strcat(parent_dir, "/");        //parent dir  gabung /
+            strcpy(temp, dir);       //temp = parentDir
+            strcat(dir, dalemDir);   //parent dir = dalemDir
+            strcat(dir, "/");        //parent dir  gabung /
             // printf(1, "%s dalemDir\n", dalemDir);
 
             recursiveDir(dalemDir, 1);
             unlink(dalemDir);
             
-            printf(1,"hapus folder %s\n",dalemDir);
-            strcpy(parent_dir, temp);
+            printf(1, "hapus folder %s\n", dalemDir);
+            strcpy(dir, temp);
         }
         else {
-            unlink(dalemDir+1);
+            unlink(dalemDir + 1);
 	        printf(1,"hapus file %s\n", dalemDir+1);
         }
     }
@@ -75,7 +75,7 @@ void recursiveDir (char * path, int flag) {
 }
 
 int main(int argc, char *argv[]){
-    parent_dir = malloc(64*sizeof(char));
+    dir = malloc(64 * sizeof(char));
 
     if (argc <= 1) {
         printf(1, "RM ERROR\n");
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]){
     }
 
     else if (argc == 2) {
-        if(strcmp(argv[1],"--help") == 0) {
+        if(strcmp(argv[1], "--help") == 0) {
             printf(1, "rm [OPTION] [FILE / DIREKTORI]\n");
             printf(1, "List Option : \n");
             printf(1, " -b      Menghapus File\n");
