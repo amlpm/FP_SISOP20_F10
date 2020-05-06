@@ -4,78 +4,90 @@
 #include "fcntl.h"
 #include "fs.h"
 
-char *dir;
-
-//sama kyk strcat
-void strcat(char *destination, char *source){
-    
-    int j = strlen (destination);
-    int x = strlen (source);
-    for (int i = 0; i < x; i++, j++) destination[j] = source[i];
-    destination[j] = '\0';
+//fungsi untuk menampilkan nama direktori / file pada folder yang akan dihapus
+char * listNama (char * path)
+{
+	static char buf[DIRSIZ + 1];
+	char *p;
+	
+    // untuk menemukan karakter pertama setelah /
+	for(p = path + strlen(path); p >= path && *p != '/'; p--);
+    p++;
+	
+	// Return blank-padded name
+	if (strlen(p) >= DIRSIZ) return p;
+	memmove (buf, p, strlen(p));
+	memset (buf + strlen(p), ' ', DIRSIZ - strlen(p));
+	return buf;
 }
 
-//kalu hapus file / direktori dalam folder, harus rekursif / baca semua file / direktori di dalamnya
-//Fungsi ini untuk membaca seluruh file / direktori di dalam folder yg mw dihapus
-void recursiveDir (char * path, int flag) {
+void ls (char *path, int flag)
+{
+	char buf[264], *p;
+	int fd;
+	struct dirent de;
+	struct stat st;
+	
+	if((fd = open(path, 0)) < 0)
+	{
+		printf(2, "cannot open %s\n", path);
+		return;
+	}
+	
+	if(fstat(fd, &st) < 0)
+	{
+		printf(2, "cannot stat %s\n", path);
+		close(fd);
+		return;
+	}
+	
+	switch(st.type)
+	{
+		case T_FILE:
+		printf(1, "name = %s, type = file, size = %d sudah dihapus\n", listNama(path), st.size);
+		unlink(path);
+		break;
+		
+		case T_DIR:
+		if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf)
+		{
+			printf(1, "path too long\n");
+			break;
+		}
 
-    char buffer[264], *p;
-    int fd;
-    struct dirent de;
-    struct stat st;
+		strcpy(buf, path);
+		p = buf + strlen(buf);
+		*p++ = '/';
+		
+		while (read(fd, &de, sizeof(de)) == sizeof(de))
+		{
+			if (de.inum == 0) continue;
+			memmove(p, de.name, DIRSIZ);
+			p[DIRSIZ] = 0;
 
-    //masuk ke direktori yang mau dihapus
-    chdir(path);
-    fd = open(".", 0);
-    fstat(fd, &st);
-    
-    strcpy(buffer, ".");
-    p = buffer + strlen(buffer);
-    *p++ = '/';
-
-    while (read(fd, &de, sizeof(de)) == sizeof(de)) {
-        
-        memmove(p, de.name, DIRSIZ);
-        p[DIRSIZ] = 0;
-        
-        if (stat(buffer, &st) < 0){
-            printf(1, "Tidak bisa stat %s\n", buffer);
-            continue;
-        }
-        
-        char *dalemDir = buffer + 1;
-
-        if (strcmp(dalemDir, "/.") == 0 || strcmp(dalemDir, "/..") == 0) continue;
-
-        if (st.type == 1) {
-            ++dalemDir;
-
-            char *temp = malloc(256*sizeof(char));
-            strcpy(temp, dir);       //temp = parentDir
-            strcat(dir, dalemDir);   //parent dir = dalemDir
-            strcat(dir, "/");        //parent dir  gabung /
-            // printf(1, "%s dalemDir\n", dalemDir);
-
-            recursiveDir(dalemDir, 1);
-            unlink(dalemDir);
+			if(stat(buf, &st) < 0)
+			{
+				printf(1, "cannot stat %s\n", buf);
+				continue;
+			}
             
-            printf(1, "hapus folder %s\n", dalemDir);
-            strcpy(dir, temp);
-        }
-        else {
-            unlink(dalemDir + 1);
-	        printf(1,"hapus file %s\n", dalemDir+1);
-        }
-    }
-    close(fd);
-    chdir("..");
+            if (flag == 1) {
+			    printf(1, "name = %s, type = directory, size = %d sudah dihapus\n", listNama(buf), st.size);
+                unlink(buf);
+            }
 
-    if (flag == 1) unlink(path);
-    else return;
+            else {
+                printf(1, "name = %s, type = directory, size = %d tidak dapat dihapus karna berupa direktori\n", listNama(buf), st.size);
+            }
+		}
+		break;
+	}
+	close(fd);
 }
 
-int main(int argc, char *argv[]){
-    dir = malloc(64 * sizeof(char));
+int main(int argc, char *argv[]) {
+
+    int fd;
 
     if (argc <= 1) {
         printf(1, "RM ERROR\n");
@@ -84,11 +96,11 @@ int main(int argc, char *argv[]){
 
     else if (argc == 2) {
         if(strcmp(argv[1], "--help") == 0) {
-            printf(1, "rm [OPTION] [FILE / DIREKTORI]\n");
-            printf(1, "List Option : \n");
+            printf(1, "\n rm [OPTION] [FILE / DIREKTORI]\n");
+            printf(1, " List Option : \n");
             printf(1, " -b      Menghapus File\n");
             printf(1, " -r      Menghapus Direktori beserta File di dalamnya\n");
-            printf(1, "  *      Menghapus semua File pada direktori tertentu\n");
+            printf(1, "  *      Menghapus semua File pada direktori tertentu\n\n");
             
             exit();
         }
@@ -96,11 +108,32 @@ int main(int argc, char *argv[]){
 
     else if (argc == 3) {
       for (int i = 1; i < argc; i++) {
-            if (strcmp(argv[i], "-r") == 0) recursiveDir(argv[i+1], 1);
+            if (strcmp(argv[i], "-r") == 0) {
+                 if ((fd = open(argv[i+1], 0)) < 0) {
+                    printf(1, "Tidak bisa buka %s\n", argv[i+1]);
+                    exit();
+                }
+                ls(argv[i+1], 1);
+                unlink(argv[i+1]);
+                printf(1,"hapus folder %s\n", argv[i+1]);
+            }
 
-            else if (strcmp(argv[i], "-b") == 0) unlink(argv[i+1]);
+            else if (strcmp(argv[i], "*") == 0) {
+                if ((fd = open(argv[i+1], 0)) < 0) {
+                    printf(1, "Tidak bisa buka %s\n", argv[i+1]);
+                    exit();
+                }
+                ls(argv[i+1], 0);
+                exit();
+            }
 
-            else if (strcmp(argv[i], "*") == 0) recursiveDir(argv[i+1], 0);
+            else if (strcmp(argv[i], "-b") == 0) {
+                if ((fd = open(argv[i+1], 0)) < 0) {
+                    printf(1, "Tidak bisa buka %s\n", argv[i+1]);
+                    exit();
+                }
+                ls(argv[i+1], 0);
+            }
         }
     }
 }
