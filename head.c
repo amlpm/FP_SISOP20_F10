@@ -7,22 +7,20 @@
 char buf[512];
 
 void head(int fd, char *name, int x) {
-    int n, line = 0;
+    int n, baris = 0;
     int i;
     
-    while((n = read(fd, buf, sizeof(buf))) > 0 && line < x) {
-        for(i=0; i<=n && line<x; i++) {
-            if(buf[i] != '\n') {
-                printf(1,"%c", buf[i]);
-            }
+    while((n = read(fd, buf, sizeof(buf))) > 0 && baris < x) {
+        for(i = 0; i <= n && baris < x; i++) {
+            if(buf[i] != '\n') printf(1, "%c", buf[i]);
             else {
-                printf(1,"\n");
-                line++;
+                printf(1, "\n");
+                baris++;
             }
         }
     }
 
-    if(n<0) {
+    if(n < 0) {
         printf(1, "ERROR\n");
         exit();
     }
@@ -54,7 +52,7 @@ int main(int argc, char *argv[]) {
   
     else if(argc==2) {
         if(strcmp(argv[1],"--help") == 0) {
-            printf(1,"\n head [FILE]               Print 10 baris pertama\n");
+            printf(1,"\n head -b [FILE]               Print 10 baris pertama\n");
             printf(1," head -n [N_ROW] [FILE]       Print N Row baris pertama\n");
             printf(1," head -v [FILE]               Print 10 Row baris pertama dan nama file pada\n");
             printf(1,"                              baris pertama\n");

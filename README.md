@@ -4,17 +4,17 @@
 ### Amelia Puji  05111840000147
 
 #### Command Table 1 :
-- **touch**
+- **touch** * [x]
 
 #### Command Table 2 :
-- **head**
-- **less**
+- **head** * [x]
+- **less** * [x]
 
 #### Command Table 3 :
-- **mv**
-    - **mv biasa**
-    - **mv \***
-- **rm**
-    - **rm biasa**
-    - **rm -r**
-    - **rm \***
+- **mv** * [x]
+    - **mv biasa** * [x]
+    - **mv \*** * [x]
+- **rm** * [x]
+    - **rm biasa** * [x]
+    - **rm -r** * [x]
+    - **rm \*** * [x]

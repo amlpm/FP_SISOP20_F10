@@ -94,13 +94,13 @@ void lsbintang(char *path) {
 	
 	if((fd = open(path, 0)) < 0)
 	{
-		printf(2, "cannot open %s\n", path);
+		printf(2, "Tidak bisa buka %s\n", path);
 		return;
 	}
 	
 	if(fstat(fd, &st) < 0)
 	{
-		printf(2, "cannot stat %s\n", path);
+		printf(2, "Tidak bisa stat %s\n", path);
 		close(fd);
 		return;
 	}
@@ -114,7 +114,7 @@ void lsbintang(char *path) {
 		
 		case T_DIR:
 			if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf) {
-				printf(1, "path too long\n");
+				printf(1, "Path terlalu panjang\n");
 				break;
 			}
 
@@ -130,7 +130,7 @@ void lsbintang(char *path) {
 
 				if (stat(buf, &st) < 0)
 				{
-					printf(1, "cannot stat %s\n", buf);
+					printf(1, "Tidak bisa stat %s\n", buf);
 					continue;
 				}
 
@@ -141,7 +141,7 @@ void lsbintang(char *path) {
 
 				else if (st.type == T_DIR) {
 					if(strcmp(buf, "./.") || strcmp(buf,"./.."));
-					printf(1,"name = %s, type = folder, size = %d Tidak bisa dihapus karena berupa direktori\n", buf, st.size);
+					printf(1,"name = %s, type = file, size = %d Tidak bisa dihapus karena berupa direktori\n", buf, st.size);
 				}
 		}
 		break;
@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
         if(strcmp(argv[1], "--help") == 0) {
             printf(1, "\n rm [OPTION] [FILE / DIREKTORI]\n");
             printf(1, " List Option : \n");
-            printf(1, " no op   Menghapus File\n");
+            printf(1, " -b      Menghapus File\n");
             printf(1, " -r      Menghapus Direktori beserta File di dalamnya\n");
             printf(1, "  *      Menghapus semua File pada direktori yg lg dikerjakan\n\n");
             

@@ -7,7 +7,7 @@
 char *sourcePath, *destinationPath, *parentDir;;
 
 //fungsi untuk copy isi source ke destination
-void cpFile (char * destination, char * source) {
+void cpFile (char *destination, char *source) {
     int baca, tulis, buat, untukWrite;
     char buffer[128];
 
@@ -126,7 +126,7 @@ void reverseDir(char * path) {
             strcat(destinationBaru, parentDir);
             strcat(destinationBaru, sourceBaru);
             cpFile(destinationBaru, namaBaru+1);
-            unlink(namaBaru+1);
+            unlink(namaBaru + 1);
         }
     }
     close(fd);
